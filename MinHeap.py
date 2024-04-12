@@ -124,7 +124,7 @@ class VerticesMinHeap:
     def rise(self, index):
         item = self.array[index]
 
-        while index//2 >= 1 and item.distance < self.array[index//2].distance:
+        while index//2 >= 1 and item < self.array[index//2]:
             self.array[index] = self.array[index // 2]
             self.array[index].pos = index
             index = index//2
@@ -153,7 +153,7 @@ class VerticesMinHeap:
 
     def get_min_child(self, index):
 
-        if index*2 == self.length or self.array[index*2].distance < self.array[index*2 + 1].distance:
+        if index*2 == self.length or self.array[index*2] < self.array[index*2 + 1]:
             return index*2
         else:
             return index*2 + 1
@@ -163,7 +163,7 @@ class VerticesMinHeap:
 
         while index*2 <= self.length:
             min_child_index = self.get_min_child(index)
-            if item.distance > self.array[min_child_index].distance:
+            if item > self.array[min_child_index]:
                 self.array[index] = self.array[min_child_index]
                 self.array[index].pos = index
                 index = min_child_index

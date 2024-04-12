@@ -128,6 +128,6 @@ if __name__ == "__main__":
     #         print(edge.v.id, edge.w)
 
 
-    print(graph.djikstra(1, 6))
+    print(graph.djikstra(1, 3))
     for vertex in graph.vertices:
         print(vertex.id, vertex.distance)
