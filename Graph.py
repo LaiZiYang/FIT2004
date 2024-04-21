@@ -6,9 +6,11 @@ class Vertex:
     def __init__(self, id) -> None:
         self.id = id
         self.edges = []
+        self.prev = None
         self.visited = False
         self.distance = 0 # Distance from source vertex
         self.pos = None # Position in the heap's array (for update operation)
+        self.is_destination = False
 
     def __str__(self) -> str:
         return "Vertex " + str(self.id)
@@ -65,6 +67,12 @@ class Graph:
         return None
 
     def djikstra(self, s, destination):
+        """
+        Dijkstra's algorithm for finding the shortest path between two vertices
+        s: source vertex
+        destination: destination vertex
+        """
+
         # Initialize all vertices with distance = infinity and visited = False
         for vertex in self.vertices:
             vertex.distance = float('inf')
@@ -91,8 +99,48 @@ class Graph:
                 if not edge.v.visited:
                     if vertex.distance + edge.w < edge.v.distance:
                         edge.v.distance = vertex.distance + edge.w
+                        edge.v.prev = vertex    # Store the previous vertex, allowing to reconstruct the path
                         heap.update(edge.v.pos, edge.v.distance)
+    
+    def one_to_many(self, s, destinations):
+        """
+        Dijkstra's algorithm for finding the shortest path between one vertex and multiple vertices
+        s: source vertex
+        destinations: list of destination vertices
+        """
 
+        counter = len(destinations)
+        for destination in destinations:
+            self.get_vertex(destination).is_destination = True
+
+        # Initialize all vertices with distance = infinity and visited = False
+        for vertex in self.vertices:
+            vertex.distance = float('inf')
+            vertex.visited = False
+
+        # Set the source vertex distance to 0
+        self.get_vertex(s).distance = 0
+
+        # Initialize MinHeap with all vertices
+        heap = VerticesMinHeap(len(self.vertices), self.vertices)
+        print(heap.array)
+
+        # Dijsktra's algorithm
+        while not heap.is_empty() and counter > 0:
+            vertex = heap.serve()
+            vertex.visited = True
+
+            # Terminate if all destination vertices are reached
+            if vertex.is_destination:
+                counter -= 1
+            
+            # Perform edge relaxation
+            for edge in vertex.edges:
+                if not edge.v.visited:
+                    if vertex.distance + edge.w < edge.v.distance:
+                        edge.v.distance = vertex.distance + edge.w
+                        edge.v.prev = vertex    # Store the previous vertex, allowing to reconstruct the path
+                        heap.update(edge.v.pos, edge.v.distance)
 
     def __str__(self) -> str:
         string = ""
@@ -112,7 +160,7 @@ if __name__ == "__main__":
     # graph.vertices[3].add_edge(graph.vertices[5], 1)
 
     graph.add_edge(1, 2, 5)
-    graph.add_edge(1, 3, 2)
+    graph.add_edge(1, 3, 14)
     graph.add_edge(1, 4, 10)
     graph.add_edge(2, 6, 2)
     graph.add_edge(3, 4, 5)
@@ -128,6 +176,15 @@ if __name__ == "__main__":
     #         print(edge.v.id, edge.w)
 
 
-    print(graph.djikstra(1, 3))
+    # print(graph.djikstra(1, 3))
+    # for vertex in graph.vertices:
+    #     print(vertex.id, vertex.distance, vertex.prev)
+
+    # v = graph.get_vertex(6)
+    # while v:
+    #     print(v.id)
+    #     v = v.prev
+
+    graph.one_to_many(1, [3, 6])
     for vertex in graph.vertices:
-        print(vertex.id, vertex.distance)
+        print(vertex.id, vertex.distance, vertex.prev)
